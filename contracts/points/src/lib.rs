@@ -51,7 +51,6 @@ impl HappyPointSystem {
 #[contracttype]
 pub enum DataKey {
     Balance(Address),
-    B,
 }
 
 mod test;
