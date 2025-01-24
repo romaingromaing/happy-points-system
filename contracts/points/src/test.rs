@@ -117,6 +117,7 @@ fn set_persistent_extended() {
         let key = DataKey::Balance(user_1);
         let ttl = env.storage().persistent().get_ttl(&key);
         println!("Persistent Extended TTL: {}", ttl);
+        assert_eq!(&ttl, &10000);
     });
 }
 
