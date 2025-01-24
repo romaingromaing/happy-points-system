@@ -1,33 +1,20 @@
-# Soroban Project
+# Demo of Stellar Smart Contract Storage
 
-## Project Structure
+Storage on Stellar smart contracts is not simple.
 
-This repository uses the recommended structure for a Soroban project:
+This developer journey will walk you through not just the intricacies of Storage but also give you some great practical
+knowledge about implementing your own point system. We will take a low-level approach to really examine some of the
+fundamental concepts of Stellar Smart Contracts.
 
-```text
-.
-├── contracts
-│   └── hello_world
-│       ├── src
-│       │   ├── lib.rs
-│       │   └── test.rs
-│       └── Cargo.toml
-├── Cargo.toml
-└── README.md
-```
+This tutorial is specifically designed for new Stellar developers!
 
-- New Soroban contracts can be put in `contracts`, each in their own directory. There is already a `hello_world`
-  contract in there to get you started.
-- If you initialized this project with any other example contracts via `--with-example`, those contracts will be in
-  the `contracts` directory as well.
-- Contracts should have their own `Cargo.toml` files that rely on the top-level `Cargo.toml` workspace for their
-  dependencies.
-- Frontend libraries can be added to the top-level directory as well. If you initialized this project with a frontend
-  template via `--frontend-template` you will have those files already included.
+While Stellar smart contract storage can seem pretty complicated at first, it offers a huge amount of opportunity for
+optimization and minimization of invocation fees for your users!  So a little bit of work up front, will go a long way
+down the line for your contract!
 
 ## Tests
 
-Tests with logs enabled
+Tests with logs enabled:
 
 ```
 cargo test -- --nocapture

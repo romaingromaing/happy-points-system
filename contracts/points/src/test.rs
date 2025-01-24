@@ -5,14 +5,14 @@ use soroban_sdk::testutils::Address as _;
 use soroban_sdk::testutils::arbitrary::std::println;
 use soroban_sdk::testutils::storage::{Instance, Persistent};
 
-use crate::{DataKey, TerriblePointSystem, TerriblePointSystemClient};
+use crate::{DataKey, HappyPointSystem, HappyPointSystemClient};
 
 #[test]
 fn test_set_balance() {
     const EXPECTED_VALUE: &u128 = &123;
     let env = Env::default();
-    let contract_id = env.register(TerriblePointSystem, ());
-    let client = TerriblePointSystemClient::new(&env, &contract_id);
+    let contract_id = env.register(HappyPointSystem, ());
+    let client = HappyPointSystemClient::new(&env, &contract_id);
 
     let user_1 = Address::generate(&env);
     client.set_balance(EXPECTED_VALUE, &user_1);
@@ -26,8 +26,8 @@ fn test_set_balance() {
 fn test_set_balance_persistent() {
     const EXPECTED_VALUE: &u128 = &123;
     let env = Env::default();
-    let contract_id = env.register(TerriblePointSystem, ());
-    let client = TerriblePointSystemClient::new(&env, &contract_id);
+    let contract_id = env.register(HappyPointSystem, ());
+    let client = HappyPointSystemClient::new(&env, &contract_id);
 
     let user_1 = Address::generate(&env);
     client.set_balance_persistent(EXPECTED_VALUE, &user_1);
@@ -41,8 +41,8 @@ fn test_set_balance_persistent() {
 fn test_set_balance_fees() {
     const EXPECTED_VALUE: &u128 = &123;
     let env = Env::default();
-    let contract_id = env.register(TerriblePointSystem, ());
-    let client = TerriblePointSystemClient::new(&env, &contract_id);
+    let contract_id = env.register(HappyPointSystem, ());
+    let client = HappyPointSystemClient::new(&env, &contract_id);
 
     let user_1 = Address::generate(&env);
     client.set_balance(EXPECTED_VALUE, &user_1);
@@ -68,8 +68,8 @@ fn test_set_balance_fees() {
 fn test_set_balance_persistent_fees() {
     const EXPECTED_VALUE: &u128 = &123;
     let env = Env::default();
-    let contract_id = env.register(TerriblePointSystem, ());
-    let client = TerriblePointSystemClient::new(&env, &contract_id);
+    let contract_id = env.register(HappyPointSystem, ());
+    let client = HappyPointSystemClient::new(&env, &contract_id);
 
     let user_1 = Address::generate(&env);
     client.set_balance_persistent(EXPECTED_VALUE, &user_1);
@@ -96,8 +96,8 @@ fn test_set_balance_persistent_fees() {
 fn set_persistent_extended() {
     const EXPECTED_VALUE: &u128 = &123;
     let env = Env::default();
-    let contract_id = env.register(TerriblePointSystem, ());
-    let client = TerriblePointSystemClient::new(&env, &contract_id);
+    let contract_id = env.register(HappyPointSystem, ());
+    let client = HappyPointSystemClient::new(&env, &contract_id);
 
     let user_1 = Address::generate(&env);
     client.set_persistent_extended(EXPECTED_VALUE, &user_1);
@@ -124,8 +124,8 @@ fn set_persistent_extended() {
 fn set_instance_extended() {
     const EXPECTED_VALUE: &u128 = &123;
     let env = Env::default();
-    let contract_id = env.register(TerriblePointSystem, ());
-    let client = TerriblePointSystemClient::new(&env, &contract_id);
+    let contract_id = env.register(HappyPointSystem, ());
+    let client = HappyPointSystemClient::new(&env, &contract_id);
 
     let user_1 = Address::generate(&env);
     client.set_instance_extended(EXPECTED_VALUE, &user_1);

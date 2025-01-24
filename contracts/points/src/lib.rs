@@ -2,10 +2,10 @@
 use soroban_sdk::{Address, contract, contractimpl, contracttype, Env};
 
 #[contract]
-pub struct TerriblePointSystem;
+pub struct HappyPointSystem;
 
 #[contractimpl]
-impl TerriblePointSystem {
+impl HappyPointSystem {
     pub fn set_balance(env: &Env, amount: u128, addr: Address) {
         let key = DataKey::Balance(addr);
         env.storage().instance().set::<DataKey, u128>(&key, &amount);
