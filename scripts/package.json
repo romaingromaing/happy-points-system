@@ -1,0 +1,29 @@
+{
+  "name": "extendttl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "extendInstanceTtl.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anataliocs/happy-points-system.git"
+  },
+  "author": "chris.anatalio@stellar.org",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anataliocs/happy-points-system/issues"
+  },
+  "homepage": "https://github.com/anataliocs/happy-points-system#readme",
+  "dependencies": {
+    "@stellar/stellar-sdk": "^13.1.0",
+    "pnpm": "^9.15.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.3"
+  }
+}

@@ -6,3 +6,6 @@ target
 .stellar
 
 .idea
+node_modules/
+/scripts/node_modules
+
