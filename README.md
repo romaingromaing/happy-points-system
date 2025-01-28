@@ -20,7 +20,24 @@ Tests with logs enabled:
 cargo test -- --nocapture
 ```
 
-## Build and Deploy Contract
+## Build and Deploy Contract with Stellar CLI
+
+Run a local stellar network, deploy contract to local, invoke `set_balance_persistent()`, encode LedgerKey as
+XDR and extend TTL of persistent storage data by key.
+
+### Run Local Stellar Network
+
+Run local Stellar network for testing
+
+```
+stellar container start local
+```
+
+Use local:
+
+```
+stellar network use local
+```
 
 Deploy to local standalone:
 
@@ -56,6 +73,20 @@ stellar contract invoke \
     --addr GANUUSIQOCQOGQRV5KR7CO64SATSFLLPRRWX5XDKXYFZ7Y4XWTEALQOX
 ```
 
-CBRS2MTQ42YB767ZWXAJBPJAZUVEH2WOVJUTNSQRNQHUSRAUFC3NWMEN
+Encode LedgerKey JSON `ledgerkey.json` as XDR:
 
-SBOATEDJ3XP6MATQSD7MOQ3HDBBO6QFXOHLAV4ZZ7SWU437TFKQXRYZG
+```
+stellar xdr encode --type LedgerKey --input json --output single-base64 ledgerkey.json
+```
+
+Extend TTL of persistent storage by 10,000 ledgers:
+
+```
+stellar contract extend \
+    --source S... \
+    --network testnet \
+    --id C... \
+    --key-xdr AAAABgAAAAFjLTJw5rAf+/m1wJC9IM0qQ+rOqmk2yhFsD0lEFCi22wAAABAAAAABAAAAAgAAAA8AAAAHQmFsYW5jZQAAAAASAAAAAAAAAAAbSkkQcKDjQjXqo/E73JAnIq1vjG1+3Gq+C5/jl7TIBQAAAAE= \
+    --ledgers-to-extend 10000 \
+    --durability persistent
+```
