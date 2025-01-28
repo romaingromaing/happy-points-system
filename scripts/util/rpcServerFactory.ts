@@ -1,20 +1,60 @@
-import {rpc} from "@stellar/stellar-sdk";
+import {Networks, Operation, rpc, TransactionBuilder, xdr} from "@stellar/stellar-sdk";
 import dotenv from "dotenv";
+import {getSourceKeypair} from "./argumentProcessor";
 
-export function getRpcServer() {
+export const NETWORK_PASSPHRASE = Networks.TESTNET;
+export const fee = "200100"; // Base fee plus resource fee
+
+export async function getAssembledSignedTransaction(sorobanData: xdr.SorobanTransactionData,
+                                                    rpcServer: rpc.Server,
+                                                    extendTo: number) {
+
+    let account =
+        await rpcServer.getAccount(getSourceKeypair().publicKey());
+
+    const transaction =
+        new TransactionBuilder(account, {
+            fee,
+            networkPassphrase: NETWORK_PASSPHRASE,
+        })
+            .setSorobanData(sorobanData)
+            .addOperation(
+                Operation.extendFootprintTtl({
+                    extendTo: extendTo,
+                }),
+            )
+            .setTimeout(30)
+            .build();
+
+    // Simulate and assemble transaction
+    const ttlSimResponse: rpc.Api.SimulateTransactionResponse =
+        await rpcServer.simulateTransaction(transaction);
+    const assembledTransaction =
+        rpc.assembleTransaction(transaction, ttlSimResponse)
+            .build();
+
+    // Sign assembled transaction
+    assembledTransaction.sign(getSourceKeypair());
+    return assembledTransaction;
+}
+
+export async function getRpcServer() {
     dotenv.config();
     const RPC_SERVER_URL = process.env.RPC_SERVER_URL;
     console.log("Using RPC Server URL: " + RPC_SERVER_URL);
 
-    return new rpc.Server(RPC_SERVER_URL, {
+    const rpcServer = new rpc.Server(RPC_SERVER_URL, {
         allowHttp: true,
         timeout: 30,
     });
+    await rpcServer.getHealth();
+    return rpcServer;
 }
 
-export function pollForTransactionCompletion(rpcServer: rpc.Server, result: rpc.Api.SendTransactionResponse) {
+export async function pollForTransactionCompletion(rpcServer: rpc.Server,
+                                                   result: rpc.Api.SendTransactionResponse) {
     return rpcServer.pollTransaction(result.hash, {
-        attempts: 5,
+        attempts: 10,
         sleepStrategy: rpc.BasicSleepStrategy
     }).then((finalStatus) => {
         switch (finalStatus.status) {
@@ -25,12 +65,16 @@ export function pollForTransactionCompletion(rpcServer: rpc.Server, result: rpc.
                 console.log("Waiting...");
                 break;
             case rpc.Api.GetTransactionStatus.SUCCESS:
-                let contractEvents = finalStatus.resultMetaXdr;
 
-                console.log(
-                    "Transaction Result: ",
-                    JSON.stringify(contractEvents, null, 2),
-                );
+                let operationMetadata = finalStatus
+                    .resultMetaXdr.v3().operations().at(0).toXDR("base64");
+
+                finalStatus.resultXdr
+
+                console.log("\n Operation Meta: \n",
+                    operationMetadata, "\n");
+                console.log("Result: \n",
+                    finalStatus.resultXdr.toXDR("base64"), "\n");
 
                 return finalStatus.status;
         }

@@ -58,19 +58,19 @@ Deploy to local standalone:
 stellar contract deploy \
     --wasm target/wasm32-unknown-unknown/release/happy_points_system.wasm \
     --source alice \
-    --network local
+    --network testnet
 ```
 
 Invoke `set_balance_persistent()` function:
 
 ```
 stellar contract invoke \
-    --id CABOIXXESAYVMNXP4HBU44DUTWFZAQAZJK5A44UFOR2KSGDHD5KUCQAJ \
+    --id CBEV5ST6AJHNCE7PCJ5UM5MCZJDRVPWVBWP7F53CV55XRPFWHY5WDRPF \
     --source alice \
     -- \
     set_balance_persistent \
     --amount 1000 \
-    --addr GANUUSIQOCQOGQRV5KR7CO64SATSFLLPRRWX5XDKXYFZ7Y4XWTEALQOX
+    --addr GBBAAKBMA5AMT25NDNXU3MQ6AJZTP6KYWG3CJ55YESWGZ75EEXGJPA36
 ```
 
 Invoke `get_balance_persistent()` function:

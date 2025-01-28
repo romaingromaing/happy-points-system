@@ -1,12 +1,12 @@
 import {Contract, Keypair, xdr} from "@stellar/stellar-sdk";
-import {getDeployedContractId, getPersistentStorageKeyString, getSourceKeypair} from "./util/argumentProcessor";
+import {getDeployedContractId, getPersistentStorageKey, getSourceKeypair} from "./util/argumentProcessor";
 
 
 module.exports = (async function () {
 
     const contractId: string = getDeployedContractId();
     const sourceKeypair = getSourceKeypair();
-    const persistentStorageKeyString: string = getPersistentStorageKeyString();
+    const persistentStorageKeyString: string = getPersistentStorageKey();
     let persistentStorageAccountId = Keypair.fromPublicKey(persistentStorageKeyString)
         .xdrAccountId();
 
@@ -30,5 +30,5 @@ module.exports = (async function () {
     let validateXDR = xdr.LedgerKey.validateXDR(ledgerKeyXdr.toXDR("base64"), "base64");
     console.log(validateXDR);
 
-    
+
 })();
