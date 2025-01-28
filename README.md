@@ -19,3 +19,43 @@ Tests with logs enabled:
 ```
 cargo test -- --nocapture
 ```
+
+## Build and Deploy Contract
+
+Deploy to local standalone:
+
+```
+stellar contract deploy \
+    --wasm target/wasm32-unknown-unknown/release/happy_points_system.wasm \
+    --source alice \
+    --network local
+```
+
+Invoke `set_balance_persistent()` function:
+
+```
+stellar contract invoke \
+    --id CBRS2MTQ42YB767ZWXAJBPJAZUVEH2WOVJUTNSQRNQHUSRAUFC3NWMEN \
+    --source alice \
+    --network standalone \
+    -- \
+    set_balance_persistent \
+    --amount 1000 \
+    --addr GANUUSIQOCQOGQRV5KR7CO64SATSFLLPRRWX5XDKXYFZ7Y4XWTEALQOX
+```
+
+Invoke `get_balance_persistent()` function:
+
+```
+stellar contract invoke \
+    --id CBRS2MTQ42YB767ZWXAJBPJAZUVEH2WOVJUTNSQRNQHUSRAUFC3NWMEN \
+    --source alice \
+    --network standalone \
+    -- \
+    get_balance_persistent \
+    --addr GANUUSIQOCQOGQRV5KR7CO64SATSFLLPRRWX5XDKXYFZ7Y4XWTEALQOX
+```
+
+CBRS2MTQ42YB767ZWXAJBPJAZUVEH2WOVJUTNSQRNQHUSRAUFC3NWMEN
+
+SBOATEDJ3XP6MATQSD7MOQ3HDBBO6QFXOHLAV4ZZ7SWU437TFKQXRYZG

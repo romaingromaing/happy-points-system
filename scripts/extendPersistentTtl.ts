@@ -8,7 +8,6 @@ import {
     TransactionBuilder,
     xdr
 } from "@stellar/stellar-sdk";
-import {Durability} from "@stellar/stellar-sdk/lib/rpc";
 
 module.exports = (async function () {
 
@@ -32,7 +31,9 @@ module.exports = (async function () {
     let persistentStorageAccountId = Keypair.fromPublicKey(persistentStorageKeyString)
         .xdrAccountId();
 
-    const rpcServer = new rpc.Server("https://soroban-testnet.stellar.org");
+    const rpcServer = new rpc.Server("http://localhost:8000/soroban/rpc", {
+        allowHttp: true
+    });
 
     // Create a new transaction builder
     const account = await rpcServer.getAccount(sourceKeypair.publicKey());
@@ -48,7 +49,7 @@ module.exports = (async function () {
     // Get Persistent Data Ledger Entry
     const persistentData = contract.getFootprint().contractData().key(dataKey);
     let persistentDataLedgerEntry = await rpcServer
-        .getContractData(contract, persistentData, Durability.Persistent);
+        .getContractData(contract, persistentData, rpc.Durability.Persistent);
 
     // Set the Soroban data and create an operation to extend the contract's TTL
     const sorobanData = new SorobanDataBuilder()
@@ -57,7 +58,7 @@ module.exports = (async function () {
         .build();
     const transaction = new TransactionBuilder(account, {
         fee,
-        networkPassphrase: Networks.TESTNET, // Use appropriate network
+        networkPassphrase: Networks.STANDALONE, // Use appropriate network
     })
         .setSorobanData(sorobanData)
         .addOperation(
@@ -73,8 +74,19 @@ module.exports = (async function () {
     const result = await rpcServer.sendTransaction(transaction);
 
     console.log(
-        "Transaction submitted. Result:",
+        "Transaction submitted:",
         JSON.stringify(result, null, 2),
     );
-    return result;
+
+    await rpcServer.pollTransaction(result.hash, {
+        attempts: 10,
+        sleepStrategy: rpc.BasicSleepStrategy
+    });
+
+    let transactionResult = await rpcServer.getTransaction(result.hash);
+
+    console.log(
+        "Transaction Result: ",
+        JSON.stringify(transactionResult, null, 2),
+    )
 })();

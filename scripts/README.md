@@ -2,6 +2,26 @@
 
 Scripts to extend TTL programatically via `ts-node` scripts for smart contracts deployed on testnet.
 
+## Run Local Stellar Network
+
+Run local Stellar network for testing
+
+```
+stellar container start local
+```
+
+Use local:
+
+```
+stellar network use local
+```
+
+Test local stellar network:
+
+```
+curl "http://localhost:8000"
+```
+
 ## Extending TTL for Instance Storage
 
 The script to extend instance storage TTL for a contract instance and instance storage.
@@ -15,7 +35,7 @@ Command:
 
 ```
 cd scripts
-npx ts-node extendInstanceTtl.ts [CONTRACT_ID] [SOURCE_KEYPAIR]
+pnpx ts-node extendInstanceTtl.ts [CONTRACT_ID] [SOURCE_KEYPAIR]
 ```
 
 ## Extending TTL for Persistent Storage
@@ -32,5 +52,5 @@ Command:
 
 ```
 cd scripts
-npx ts-node extendPersistentTtl.ts [CONTRACT_ID] [SOURCE_KEYPAIR] [PERSISTENT_STORAGE_KEY]
+pnpx ts-node extendPersistentTtl.ts [CONTRACT_ID] [SOURCE_KEYPAIR] [PERSISTENT_STORAGE_KEY]
 ```
