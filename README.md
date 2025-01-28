@@ -30,7 +30,20 @@ XDR and extend TTL of persistent storage data by key.
 Run local Stellar network for testing
 
 ```
-stellar container start local
+stellar container start local --limits testnet
+```
+
+Or with native docker commands for additional customization options
+
+```
+docker run --rm -it \
+    -p 8000:8000 \
+    --name stellar \
+    stellar/quickstart:testing \
+    --standalone \
+    --enable-soroban-rpc \
+    --limits default
+
 ```
 
 Use local:
@@ -52,9 +65,8 @@ Invoke `set_balance_persistent()` function:
 
 ```
 stellar contract invoke \
-    --id CBRS2MTQ42YB767ZWXAJBPJAZUVEH2WOVJUTNSQRNQHUSRAUFC3NWMEN \
+    --id CABOIXXESAYVMNXP4HBU44DUTWFZAQAZJK5A44UFOR2KSGDHD5KUCQAJ \
     --source alice \
-    --network standalone \
     -- \
     set_balance_persistent \
     --amount 1000 \
@@ -65,9 +77,8 @@ Invoke `get_balance_persistent()` function:
 
 ```
 stellar contract invoke \
-    --id CBRS2MTQ42YB767ZWXAJBPJAZUVEH2WOVJUTNSQRNQHUSRAUFC3NWMEN \
+    --id CABOIXXESAYVMNXP4HBU44DUTWFZAQAZJK5A44UFOR2KSGDHD5KUCQAJ \
     --source alice \
-    --network standalone \
     -- \
     get_balance_persistent \
     --addr GANUUSIQOCQOGQRV5KR7CO64SATSFLLPRRWX5XDKXYFZ7Y4XWTEALQOX
@@ -83,10 +94,20 @@ Extend TTL of persistent storage by 10,000 ledgers:
 
 ```
 stellar contract extend \
-    --source S... \
-    --network testnet \
-    --id C... \
-    --key-xdr AAAABgAAAAFjLTJw5rAf+/m1wJC9IM0qQ+rOqmk2yhFsD0lEFCi22wAAABAAAAABAAAAAgAAAA8AAAAHQmFsYW5jZQAAAAASAAAAAAAAAAAbSkkQcKDjQjXqo/E73JAnIq1vjG1+3Gq+C5/jl7TIBQAAAAE= \
+    --source alice \
+    --id CABOIXXESAYVMNXP4HBU44DUTWFZAQAZJK5A44UFOR2KSGDHD5KUCQAJ \
+    --key-xdr AAAABgAAAAGwZ1dyW0P7qAx913CFhpYGupGYPd3Fd1H8ujJu+y4QygAAABAAAAABAAAAAgAAAA8AAAAHQmFsYW5jZQAAAAASAAAAAAAAAAAbSkkQcKDjQjXqo/E73JAnIq1vjG1+3Gq+C5/jl7TIBQAAAAE= \
     --ledgers-to-extend 10000 \
     --durability persistent
+```
+
+Check TTL
+
+```
+stellar contract read \
+    --output xdr \
+    --id CABOIXXESAYVMNXP4HBU44DUTWFZAQAZJK5A44UFOR2KSGDHD5KUCQAJ \
+    --key-xdr AAAABgAAAAEC5F7kkDFWNu/hw05wdJ2LkEAZSroOcoV0dKkYZx9VQQAAABAAAAABAAAAAgAAAA8AAAAHQmFsYW5jZQAAAAASAAAAAAAAAAAbSkkQcKDjQjXqo/E73JAnIq1vjG1+3Gq+C5/jl7TIBQAAAAE= \
+    --durability persistent \
+    --network testnet 
 ```

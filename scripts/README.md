@@ -22,13 +22,21 @@ Test local stellar network:
 curl "http://localhost:8000"
 ```
 
+### Setting .env
+
+Create `.env` file for use in `rpcServerFactory.ts`
+
+```
+cp .env.example .env
+```
+
 ## Extending TTL for Instance Storage
 
 The script to extend instance storage TTL for a contract instance and instance storage.
 
 Parameters:
 
-- CONTRACT_ID (required) - Deployed contract ID on testnext
+- CONTRACT_ID (required) - Deployed contract ID
 - SOURCE_KEYPAIR (required)
 
 Command:

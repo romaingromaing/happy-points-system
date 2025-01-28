@@ -8,32 +8,19 @@ import {
     TransactionBuilder,
     xdr
 } from "@stellar/stellar-sdk";
+import {getRpcServer, pollForTransactionCompletion} from "./util/rpcServerFactory";
+import {getDeployedContractId, getPersistentStorageKeyString, getSourceKeypair} from "./util/argumentProcessor";
+
 
 module.exports = (async function () {
+    const NETWORK_PASSPHRASE = Networks.TESTNET; // Use appropriate network
 
-    // Ensure parameters are passed in
-    if (!process.argv[2]) {
-        console.error(`You must provide a contractId as a parameter \n`);
-        return;
-    }
-    if (!process.argv[3]) {
-        console.error(`You must provide a sourceKeypair as a parameter \n`);
-        return;
-    }
-    if (!process.argv[4]) {
-        console.error(`You must provide a persistentStorageKey as a parameter \n`);
-        return;
-    }
-
-    const contractId: string = process.argv[2];
-    const sourceKeypair = Keypair.fromSecret(process.argv[3]);
-    const persistentStorageKeyString: string = process.argv[4];
+    const contractId: string = getDeployedContractId();
+    const sourceKeypair = getSourceKeypair();
+    const persistentStorageKeyString: string = getPersistentStorageKeyString();
     let persistentStorageAccountId = Keypair.fromPublicKey(persistentStorageKeyString)
         .xdrAccountId();
-
-    const rpcServer = new rpc.Server("http://localhost:8000/soroban/rpc", {
-        allowHttp: true
-    });
+    const rpcServer = getRpcServer();
 
     // Create a new transaction builder
     const account = await rpcServer.getAccount(sourceKeypair.publicKey());
@@ -51,6 +38,9 @@ module.exports = (async function () {
     let persistentDataLedgerEntry = await rpcServer
         .getContractData(contract, persistentData, rpc.Durability.Persistent);
 
+    let ttlBefore = persistentDataLedgerEntry.key.toXDR("base64");
+    console.log("TTL Before: " + ttlBefore);
+
     // Set the Soroban data and create an operation to extend the contract's TTL
     const sorobanData = new SorobanDataBuilder()
         .setResourceFee(200_000)
@@ -58,35 +48,42 @@ module.exports = (async function () {
         .build();
     const transaction = new TransactionBuilder(account, {
         fee,
-        networkPassphrase: Networks.STANDALONE, // Use appropriate network
+        networkPassphrase: NETWORK_PASSPHRASE,
     })
         .setSorobanData(sorobanData)
         .addOperation(
             Operation.extendFootprintTtl({
-                extendTo: 10_000,
+                extendTo: 2913482,
             }),
         )
         .setTimeout(30)
         .build();
 
+    const ttlSimResponse: rpc.Api.SimulateTransactionResponse =
+        await rpcServer.simulateTransaction(transaction);
+
+    let assembledTransaction =
+        rpc.assembleTransaction(transaction, ttlSimResponse)
+            .build();
+
     // Sign and submit the transaction
-    transaction.sign(sourceKeypair);
-    const result = await rpcServer.sendTransaction(transaction);
+    assembledTransaction.sign(sourceKeypair);
+    const result = await rpcServer.sendTransaction(assembledTransaction);
 
     console.log(
         "Transaction submitted:",
         JSON.stringify(result, null, 2),
     );
 
-    await rpcServer.pollTransaction(result.hash, {
-        attempts: 10,
-        sleepStrategy: rpc.BasicSleepStrategy
-    });
+    let getTransactionResponsePromise = pollForTransactionCompletion(rpcServer, result);
 
-    let transactionResult = await rpcServer.getTransaction(result.hash);
+    let success = await getTransactionResponsePromise;
 
-    console.log(
-        "Transaction Result: ",
-        JSON.stringify(transactionResult, null, 2),
-    )
+    let contractDataAfter = await rpcServer
+        .getContractData(contract, persistentData, rpc.Durability.Persistent);
+
+    let ttlAfter = contractDataAfter.liveUntilLedgerSeq;
+    console.log("TTL After: " + ttlAfter);
+
+    console.log(success);
 })();

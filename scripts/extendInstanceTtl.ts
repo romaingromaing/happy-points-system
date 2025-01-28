@@ -1,29 +1,14 @@
-import {
-    Contract,
-    Keypair,
-    Networks,
-    Operation,
-    rpc,
-    SorobanDataBuilder,
-    TransactionBuilder
-} from "@stellar/stellar-sdk";
+import {Contract, Networks, Operation, rpc, SorobanDataBuilder, TransactionBuilder} from "@stellar/stellar-sdk";
+import {getRpcServer} from "./util/rpcServerFactory";
+import {getDeployedContractId, getSourceKeypair} from "./util/argumentProcessor";
+
 
 module.exports = (async function () {
+    const NETWORK_PASSPHRASE = Networks.TESTNET; // Use appropriate network
 
-    // Ensure parameters are passed in
-    if (!process.argv[2]) {
-        console.error(`You must provide a contractId as a parameter \n`);
-        return;
-    }
-    if (!process.argv[3]) {
-        console.error(`You must provide a sourceKeypair as a parameter \n`);
-        return;
-    }
-
-    const contractId: string = process.argv[2];
-    const sourceKeypair = Keypair.fromSecret(process.argv[3]);
-
-    const rpcServer = new rpc.Server("https://soroban-testnet.stellar.org");
+    const contractId: string = getDeployedContractId();
+    const sourceKeypair = getSourceKeypair();
+    const rpcServer = getRpcServer();
 
     // Create a new transaction builder
     const account = await rpcServer.getAccount(sourceKeypair.publicKey());
@@ -41,24 +26,43 @@ module.exports = (async function () {
 
     const transaction = new TransactionBuilder(account, {
         fee,
-        networkPassphrase: Networks.TESTNET, // Use appropriate network
+        networkPassphrase: NETWORK_PASSPHRASE,
     })
         .setSorobanData(sorobanData)
         .addOperation(
             Operation.extendFootprintTtl({
-                extendTo: 10_000,
+                extendTo: 2913482,
             }),
         )
         .setTimeout(30)
         .build();
 
+    const ttlSimResponse: rpc.Api.SimulateTransactionResponse =
+        await rpcServer.simulateTransaction(transaction);
+
+    let assembledTransaction =
+        rpc.assembleTransaction(transaction, ttlSimResponse)
+            .build();
+
     // Sign and submit the transaction
-    transaction.sign(sourceKeypair);
-    const result = await rpcServer.sendTransaction(transaction);
+    assembledTransaction.sign(sourceKeypair);
+    const result = await rpcServer.sendTransaction(assembledTransaction);
 
     console.log(
         "Transaction submitted. Result:",
         JSON.stringify(result, null, 2),
     );
-    return result;
+
+    await rpcServer.pollTransaction(result.hash, {
+        attempts: 10,
+        sleepStrategy: rpc.BasicSleepStrategy
+    });
+
+    let transactionResult = await rpcServer.getTransaction(result.hash);
+
+    console.log(
+        "Transaction Result: ",
+        JSON.stringify(transactionResult, null, 2),
+    );
+
 })();

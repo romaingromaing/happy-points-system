@@ -18,6 +18,7 @@
   "homepage": "https://github.com/anataliocs/happy-points-system#readme",
   "dependencies": {
     "@stellar/stellar-sdk": "^13.1.0",
+    "dotenv": "^16.4.7",
     "pnpm": "^9.15.4"
   },
   "devDependencies": {
