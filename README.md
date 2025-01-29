@@ -33,19 +33,6 @@ Run local Stellar network for testing
 stellar container start local --limits testnet
 ```
 
-Or with native docker commands for additional customization options
-
-```
-docker run --rm -it \
-    -p 8000:8000 \
-    --name stellar \
-    stellar/quickstart:testing \
-    --standalone \
-    --enable-soroban-rpc \
-    --limits default
-
-```
-
 Use local:
 
 ```
@@ -58,26 +45,26 @@ Deploy to local standalone:
 stellar contract deploy \
     --wasm target/wasm32-unknown-unknown/release/happy_points_system.wasm \
     --source alice \
-    --network testnet
+    --network local
 ```
 
 Invoke `set_balance_persistent()` function:
 
 ```
 stellar contract invoke \
-    --id CBEV5ST6AJHNCE7PCJ5UM5MCZJDRVPWVBWP7F53CV55XRPFWHY5WDRPF \
+    --id CAWI33QKYJ2JV42O2KQG36MHBKQO4F3IKZPKT6C2HL7OI5VNAEM2SDE7 \
     --source alice \
     -- \
     set_balance_persistent \
     --amount 1000 \
-    --addr GBBAAKBMA5AMT25NDNXU3MQ6AJZTP6KYWG3CJ55YESWGZ75EEXGJPA36
+    --addr GANUUSIQOCQOGQRV5KR7CO64SATSFLLPRRWX5XDKXYFZ7Y4XWTEALQOX
 ```
 
 Invoke `get_balance_persistent()` function:
 
 ```
 stellar contract invoke \
-    --id CABOIXXESAYVMNXP4HBU44DUTWFZAQAZJK5A44UFOR2KSGDHD5KUCQAJ \
+    --id CAWI33QKYJ2JV42O2KQG36MHBKQO4F3IKZPKT6C2HL7OI5VNAEM2SDE7 \
     --source alice \
     -- \
     get_balance_persistent \

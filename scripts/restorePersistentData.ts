@@ -1,6 +1,7 @@
-import {Contract, Operation, rpc, SorobanDataBuilder, xdr} from "@stellar/stellar-sdk";
-import {getAssembledSignedTransaction, getRpcServer, pollForTransactionCompletion} from "./util/rpcServerFactory";
+import {Contract, Operation, SorobanDataBuilder, xdr} from "@stellar/stellar-sdk";
 import {getDeployedContractId, getPersistentStorageKey} from "./util/argumentProcessor";
+import {getAssembledSignedTransaction, getRpcServer, pollForTransactionCompletion} from "./util/rpcServerFactory";
+
 
 module.exports = (async function () {
     let persistentStorageAccountId = getPersistentStorageKey();
@@ -13,22 +14,23 @@ module.exports = (async function () {
     // Get the contract instance
     const contract = new Contract(getDeployedContractId());
 
-    // Get Persistent Data Ledger Entry
-    const persistentData = contract.getFootprint().contractData().key(dataKey);
-    const persistentDataLedgerEntry = await rpcServer
-        .getContractData(contract, persistentData, rpc.Durability.Persistent);
+    let ledgerKeyContractData = new xdr.LedgerKeyContractData({
+        durability: xdr.ContractDataDurability.persistent(),
+        contract: xdr.ScAddress.scAddressTypeContract(contract.address().toBuffer()),
+        key: dataKey
+    });
+
+    let ledgerKeyXdr = xdr.LedgerKey.contractData(ledgerKeyContractData);
 
     // Set the Soroban data and create an operation to extend the contract's TTL
     const sorobanData = new SorobanDataBuilder()
         .setResourceFee(200_000)
-        .setReadOnly([persistentDataLedgerEntry.key])
+        .setReadWrite([ledgerKeyXdr])
         .build();
 
     let assembledTransaction =
         await getAssembledSignedTransaction(sorobanData, rpcServer,
-            Operation.extendFootprintTtl({
-                extendTo: 200,
-            }));
+            Operation.restoreFootprint({}));
 
     const result =
         await rpcServer.sendTransaction(assembledTransaction);
@@ -38,4 +40,4 @@ module.exports = (async function () {
 })()
     .then(value => console.log(value))
     .catch(reason => console.log(reason))
-    .finally(() => console.log("extendPersistentTtl.ts script complete \n"));
+    .finally(() => console.log("restorePersistentTtl.ts script complete \n"));

@@ -1,28 +1,32 @@
-import {Contract, Operation, SorobanDataBuilder} from "@stellar/stellar-sdk";
+import {Operation, SorobanDataBuilder, xdr} from "@stellar/stellar-sdk";
 import {getAssembledSignedTransaction, getRpcServer, pollForTransactionCompletion} from "./util/rpcServerFactory";
-import {getDeployedContractId} from "./util/argumentProcessor";
+
 
 module.exports = (async function () {
     const rpcServer = await getRpcServer();
 
-    const contract = new Contract(getDeployedContractId());
-    const instance = contract.getFootprint();
+    let arrayBufferBuffer =
+        Buffer.from("4b9316721487281d8201e1c6044544400f120253487971e339eb23a465516935", 'hex');
+
+    let ledgerKeyXdr = xdr.LedgerKey
+        .contractCode(new xdr.LedgerKeyContractCode({hash: arrayBufferBuffer}));
 
     // Set the Soroban data and create an operation to extend the contract's TTL
     const sorobanData = new SorobanDataBuilder()
         .setResourceFee(200_000)
-        .setReadOnly([instance])
+        .setReadWrite([ledgerKeyXdr])
         .build();
 
     let assembledTransaction =
         await getAssembledSignedTransaction(sorobanData, rpcServer,
-            Operation.extendFootprintTtl({
-                extendTo: 2999499,
-            }));
+            Operation.restoreFootprint({}));
+
     const result =
         await rpcServer.sendTransaction(assembledTransaction);
+    console.log("Transaction Hash: " + result.hash);
 
     return await pollForTransactionCompletion(rpcServer, result);
-})().then(value => console.log(value))
+})()
+    .then(value => console.log(value))
     .catch(reason => console.log(reason))
-    .finally(() => console.log("extendInstanceTtl.ts script complete \n"));
+    .finally(() => console.log("restorePersistentTtl.ts script complete \n"));

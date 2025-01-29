@@ -2,12 +2,12 @@ import {Networks, Operation, rpc, TransactionBuilder, xdr} from "@stellar/stella
 import dotenv from "dotenv";
 import {getSourceKeypair} from "./argumentProcessor";
 
-export const NETWORK_PASSPHRASE = Networks.TESTNET;
+export const NETWORK_PASSPHRASE = Networks.STANDALONE;
 export const fee = "200100"; // Base fee plus resource fee
 
 export async function getAssembledSignedTransaction(sorobanData: xdr.SorobanTransactionData,
                                                     rpcServer: rpc.Server,
-                                                    extendTo: number) {
+                                                    operation: xdr.Operation<Operation.ExtendFootprintTTL> | xdr.Operation<Operation.RestoreFootprint>) {
 
     let account =
         await rpcServer.getAccount(getSourceKeypair().publicKey());
@@ -19,12 +19,11 @@ export async function getAssembledSignedTransaction(sorobanData: xdr.SorobanTran
         })
             .setSorobanData(sorobanData)
             .addOperation(
-                Operation.extendFootprintTtl({
-                    extendTo: extendTo,
-                }),
+                operation,
             )
             .setTimeout(30)
             .build();
+
 
     // Simulate and assemble transaction
     const ttlSimResponse: rpc.Api.SimulateTransactionResponse =
@@ -55,21 +54,19 @@ export async function pollForTransactionCompletion(rpcServer: rpc.Server,
                                                    result: rpc.Api.SendTransactionResponse) {
     return rpcServer.pollTransaction(result.hash, {
         attempts: 10,
-        sleepStrategy: rpc.BasicSleepStrategy
+        sleepStrategy: rpc.LinearSleepStrategy
     }).then((finalStatus) => {
         switch (finalStatus.status) {
             case rpc.Api.GetTransactionStatus.FAILED:
                 console.log(finalStatus.status);
                 break;
             case rpc.Api.GetTransactionStatus.NOT_FOUND:
-                console.log("Waiting...");
+                console.log("Waiting... ", finalStatus.txHash, " ", finalStatus.status);
                 break;
             case rpc.Api.GetTransactionStatus.SUCCESS:
 
                 let operationMetadata = finalStatus
                     .resultMetaXdr.v3().operations().at(0).toXDR("base64");
-
-                finalStatus.resultXdr
 
                 console.log("\n Operation Meta: \n",
                     operationMetadata, "\n");
@@ -78,5 +75,5 @@ export async function pollForTransactionCompletion(rpcServer: rpc.Server,
 
                 return finalStatus.status;
         }
-    });
+    }).catch(reason => console.log(reason));
 }

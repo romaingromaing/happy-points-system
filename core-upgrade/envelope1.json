@@ -1,0 +1,43 @@
+{
+  "tx": {
+    "tx": {
+      "source_account": "GCTI6HMWRH2QGMFKWVU5M5ZSOTKL7P7JAHZDMJJBKDHGWTEC4CJ7O3DU",
+      "fee": 150000000,
+      "seq_num": 21238613278722,
+      "cond": "none",
+      "memo": "none",
+      "operations": [
+        {
+          "source_account": null,
+          "body": {
+            "restore_footprint": {
+              "ext": "v0"
+            }
+          }
+        }
+      ],
+      "ext": {
+        "v1": {
+          "ext": "v0",
+          "resources": {
+            "footprint": {
+              "read_only": [],
+              "read_write": [
+                {
+                  "contract_code": {
+                    "hash": "4b9316721487281d8201e1c6044544400f120253487971e339eb23a465516935"
+                  }
+                }
+              ]
+            },
+            "instructions": 0,
+            "read_bytes": 2000,
+            "write_bytes": 2000
+          },
+          "resource_fee": 195000100
+        }
+      }
+    },
+    "signatures": []
+  }
+}
