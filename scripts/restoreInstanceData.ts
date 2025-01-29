@@ -1,31 +1,18 @@
-import {Contract, Operation, SorobanDataBuilder, xdr} from "@stellar/stellar-sdk";
-import {getDeployedContractId, getPersistentStorageKey} from "./util/argumentProcessor";
+import {Contract, Operation, SorobanDataBuilder} from "@stellar/stellar-sdk";
+import {getDeployedContractId} from "./util/argumentProcessor";
 import {getAssembledSignedTransaction, getRpcServer, pollForTransactionCompletion} from "./util/rpcServerFactory";
 
 
-module.exports = (async function () {
-    let persistentStorageAccountId = getPersistentStorageKey();
+module.exports = (async function restoreInstanceData() {
     const rpcServer = await getRpcServer();
 
-    // Persistent DataKey XDR value
-    let dataKey = xdr.ScVal.scvVec([xdr.ScVal.scvSymbol("Balance"),
-        xdr.ScVal.scvAddress(xdr.ScAddress.scAddressTypeAccount(persistentStorageAccountId))]);
-
-    // Get the contract instance
     const contract = new Contract(getDeployedContractId());
+    const instance = contract.getFootprint();
 
-    let ledgerKeyContractData = new xdr.LedgerKeyContractData({
-        durability: xdr.ContractDataDurability.persistent(),
-        contract: xdr.ScAddress.scAddressTypeContract(contract.address().toBuffer()),
-        key: dataKey
-    });
-
-    let ledgerKeyXdr = xdr.LedgerKey.contractData(ledgerKeyContractData);
-
-    // Set the Soroban data and create an operation to extend the contract's TTL
+    // Set the Soroban data and create an operation to restore the contract instance
     const sorobanData = new SorobanDataBuilder()
         .setResourceFee(200_000)
-        .setReadWrite([ledgerKeyXdr])
+        .setReadWrite([instance])
         .build();
 
     let assembledTransaction =
@@ -42,7 +29,7 @@ module.exports = (async function () {
                 // Set the Soroban data and create an operation to extend the contract's TTL
                 const extendTTLSorobanData = new SorobanDataBuilder()
                     .setResourceFee(200_000)
-                    .setReadOnly([ledgerKeyXdr])
+                    .setReadOnly([instance])
                     .build();
 
                 await getAssembledSignedTransaction(extendTTLSorobanData, rpcServer,
@@ -54,4 +41,4 @@ module.exports = (async function () {
 })()
     .then(value => console.log(value))
     .catch(reason => console.log(reason))
-    .finally(() => console.log("restorePersistentTtl.ts script complete \n"));
+    .finally(() => console.log("restoreInstanceData.ts script complete \n"));

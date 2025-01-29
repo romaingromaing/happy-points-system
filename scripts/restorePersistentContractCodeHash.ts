@@ -29,4 +29,4 @@ module.exports = (async function () {
 })()
     .then(value => console.log(value))
     .catch(reason => console.log(reason))
-    .finally(() => console.log("restorePersistentTtl.ts script complete \n"));
+    .finally(() => console.log("restorePersistentData.ts script complete \n"));
