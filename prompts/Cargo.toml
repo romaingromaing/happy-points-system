@@ -10,3 +10,4 @@ path = "src/main.rs"
 [dependencies]
 promkit = "=0.6.2"
 anyhow = "1.0.95"
+log = "0.4.25"

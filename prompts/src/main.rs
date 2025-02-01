@@ -3,12 +3,10 @@ use std::os::unix::process::CommandExt;
 
 use promkit::crossterm::style::{Attribute, Attributes};
 use promkit::grapheme::StyledGraphemes;
-use promkit::listbox::Listbox;
 use promkit::preset::confirm::Confirm;
+use promkit::preset::listbox::Listbox;
 use promkit::preset::readline::Readline;
 use promkit::style::StyleBuilder;
-use promkit::suggest::Suggest;
-use promkit::text_editor::Mode;
 
 mod form_one;
 
@@ -17,36 +15,54 @@ fn main() -> anyhow::Result<()> {
         Confirm::new("This command line tool will walk through executing various scripts to perform Extend TTL and Restore Archived data commands")
             .prompt()?.run();
 
-    let listbox = Listbox::from_styled_graphemes(Vec::from([
+    let listbox = Listbox::new(Vec::from([
+        StyledGraphemes::from("Extend TTL"),
+        StyledGraphemes::from("Restore Archived Data"),
+    ]))
+    .title("Choose operation")
+    .listbox_lines(3)
+    .prompt()
+    .unwrap()
+    .run();
+
+    let listbox_two = Listbox::new(Vec::from([
         StyledGraphemes::from("Extend instance TTL"),
-        StyledGraphemes::from("Extend persistence TTL")
-    ]));
+        StyledGraphemes::from("Extend persistence TTL"),
+    ]))
+    .title("Extend TTL for what time of Smart Contract Storage?")
+    .title_style(
+        StyleBuilder::new()
+            .attrs(Attributes::from(Attribute::Framed).with(Attribute::Bold))
+            .build(),
+    )
+    .listbox_lines(3)
+    .prompt()
+    .unwrap()
+    .run();
 
+    Readline::default()
+        .title("Enter Deployed CONTRACT_ID")
+        .prefix("Contract ID ❯❯ ")
+        .prompt()
+        .unwrap()
+        .run()?;
+    Readline::default()
+        .title("Enter Secret Key for testnet")
+        .prefix("Secret Key ❯❯ ")
+        .prompt()
+        .unwrap()
+        .run()?;
+    Readline::default()
+        .title("Enter Public Key for testnet")
+        .prefix("Public Key ❯❯ ")
+        .prompt()
+        .unwrap()
+        .run()?;
 
-    /*    let t = match Terminal::start_session(&[Pane::new(listbox.items().clone(), 0)]) {
-            Ok(terminal) => { terminal }
-            Err(e) => { return Err(anyhow!("")) }
-        };*/
-
-
-    let mut p = Readline::default()
-        .title("Extend TTL & Restore Archive data Script")
-        .title_style(StyleBuilder::new()
-            .attrs(Attributes::from(Attribute::Framed)
-                .with(Attribute::Bold)).build())
-        .edit_mode(Mode::Overwrite)
-        .enable_history()
-
-        .enable_suggest(Suggest::from_iter([
-            "Extend instance TTL",
-            "Extend persistence TTL",
-        ])).text_editor_lines(3)
-        .validator(
-            |text| text.eq_ignore_ascii_case("Extend instance TTL")
-                || text.eq_ignore_ascii_case("Extend persistence TTL"),
-            |val| String::from("Select one"))
-        .prompt()?.run()?;
-
+    println!("\n Executing script...");
+    println!(
+        "pnpx ts-node extendPersistentTtl.ts [CONTRACT_ID] [SOURCE_KEYPAIR] [PERSISTENT_STORAGE_KEY]"
+    );
 
     Ok(())
 }

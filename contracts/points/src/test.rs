@@ -1,9 +1,9 @@
 #![cfg(test)]
 
-use soroban_sdk::{Address, Env};
-use soroban_sdk::testutils::Address as _;
 use soroban_sdk::testutils::arbitrary::std::println;
 use soroban_sdk::testutils::storage::{Instance, Persistent};
+use soroban_sdk::testutils::Address as _;
+use soroban_sdk::{Address, Env};
 
 use crate::{DataKey, HappyPointSystem, HappyPointSystemClient};
 
