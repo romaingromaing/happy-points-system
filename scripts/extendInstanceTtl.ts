@@ -14,6 +14,7 @@ module.exports = (async function () {
         .setReadOnly([instance])
         .build();
 
+
     let assembledTransaction =
         await getAssembledSignedTransaction(sorobanData, rpcServer,
             Operation.extendFootprintTtl({

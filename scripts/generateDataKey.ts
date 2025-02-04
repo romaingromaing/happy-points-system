@@ -25,6 +25,4 @@ module.exports = (async function () {
 
     let validateXDR = xdr.LedgerKey.validateXDR(ledgerKeyXdr.toXDR("base64"), "base64");
     console.log(validateXDR);
-
-
 })();

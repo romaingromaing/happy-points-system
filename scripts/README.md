@@ -36,14 +36,14 @@ The script to extend instance storage TTL for a contract instance and instance s
 
 Parameters:
 
-- CONTRACT_ID (required) - Deployed contract ID
+- contract_id (required) - Deployed contract ID
 - SOURCE_KEYPAIR (required)
 
 Command:
 
 ```
 cd scripts
-pnpx ts-node extendInstanceTtl.ts [CONTRACT_ID] [SOURCE_KEYPAIR]
+pnpx ts-node extendInstanceTtl.ts [contract_id] [SOURCE_KEYPAIR]
 ```
 
 ## Extending TTL for Persistent Storage
@@ -52,7 +52,7 @@ The script to extend persistent storage TTL for a specific key.
 
 Parameters:
 
-- CONTRACT_ID (required)
+- contract_id (required)
 - SOURCE_KEYPAIR (required)
 - PERSISTENT_STORAGE_KEY (required)
 
@@ -60,5 +60,5 @@ Command:
 
 ```
 cd scripts
-pnpx ts-node extendPersistentTtl.ts [CONTRACT_ID] [SOURCE_KEYPAIR] [PERSISTENT_STORAGE_KEY]
+pnpx ts-node extendPersistentTtl.ts [contract_id] [SOURCE_KEYPAIR] [PERSISTENT_STORAGE_KEY]
 ```

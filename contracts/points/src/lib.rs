@@ -1,5 +1,7 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env};
+extern crate alloc;
+
+use soroban_sdk::{Address, contract, contractimpl, contracttype, Env};
 
 #[contract]
 pub struct HappyPointSystem;

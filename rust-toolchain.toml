@@ -1,0 +1,5 @@
+[toolchain]
+channel = "stable-aarch64-apple-darwin"
+targets = ["wasm32-unknown-unknown"]
+components = ["rustc", "cargo", "rustfmt", "clippy", "rust-src"]
+

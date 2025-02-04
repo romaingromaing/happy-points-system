@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-  "contracts/*", "prompts",
+    "contracts/*"
 ]
 
 [workspace.dependencies]
@@ -21,3 +21,4 @@ lto = true
 [profile.release-with-logs]
 inherits = "release"
 debug-assertions = true
+
